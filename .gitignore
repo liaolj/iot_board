@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+.env
+.venv/
+backend/.venv/
+backend/iot_board.db
+node_modules/
+frontend/node_modules/
+frontend/dist/
