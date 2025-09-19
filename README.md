@@ -37,6 +37,47 @@ The dev server proxies API calls to `http://localhost:8000` by default.
 * When the backend starts, a simulation worker pushes demo data every few seconds. This keeps the dashboard lively in demos.
 * The backend uses SQLite via SQLAlchemy's async engine. Database schema is created automatically on startup.
 * Realtime broadcasts are logged in the `realtime_dispatch_log` table for traceability.
+
+## Testing
+
+The repository ships with a full testing stack covering the backend, frontend and end-to-end flows. All commands below assume the repository root as the working directory.
+
+### Backend unit & integration tests
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pytest
+```
+
+These tests exercise the async data ingestion pipeline, API endpoints and the simulation-mode switch using an isolated SQLite database.
+
+### Frontend component tests
+
+```bash
+cd frontend
+npm install
+npm run test:run
+```
+
+Vitest together with Testing Library validates component state management, realtime event subscriptions and dashboard wiring.
+
+### End-to-end tests
+
+```bash
+cd frontend
+npm install
+npx playwright install --with-deps
+npm run test:e2e
+```
+
+Playwright boots the Vite dev server, stubs backend APIs and verifies the dashboard’s critical user journeys including realtime mode transitions.
+
+### Continuous integration
+
+A GitHub Actions workflow (`.github/workflows/ci.yml`) runs linting, backend pytest, frontend unit tests, the production build and Playwright end-to-end checks on every push. The workflow definition can be used as a template for other CI platforms.
 =======
 # IoT Board Backend
 
