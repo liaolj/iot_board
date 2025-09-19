@@ -28,6 +28,7 @@ export class RealtimeService {
   constructor(endpoint: string = DEFAULT_ENDPOINT) {
     this.url = this.resolveUrl(endpoint);
     this.connect();
+    this.registerTestHooks();
   }
 
   private resolveUrl(endpoint: string): string {
@@ -195,6 +196,30 @@ export class RealtimeService {
       window.clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+  }
+
+  private registerTestHooks() {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const hooks = {
+      emit: (event: string, payload: any) => {
+        this.dispatchEvent(event, payload);
+      },
+      triggerOpen: () => {
+        this.emitter.emit("open", new Event("open"));
+      },
+      triggerClose: () => {
+        const closeEvent = typeof CloseEvent !== "undefined"
+          ? new CloseEvent("close", { wasClean: true, code: 1000, reason: "test" })
+          : (new Event("close") as unknown as CloseEvent);
+        this.emitter.emit("close", closeEvent);
+      },
+      triggerError: () => {
+        this.emitter.emit("error", new Event("error"));
+      }
+    };
+    (window as any).__iotRealtimeTestHooks = hooks;
   }
 }
 
